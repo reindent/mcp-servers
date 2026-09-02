@@ -1,0 +1,242 @@
+
+==============================================================================
+  S-42 · AgenticList  [HTTP at /, stateless, origin-protected — localhost]
+==============================================================================
+
+TOOLS ADVERTISED (4):
+  • list_agents — List agents
+      readOnly=true destructive=false params=[category, limit, offset]
+  • search_agents — Search agents
+      readOnly=true destructive=false params=[query, limit]
+  • get_agent — Get one agent
+      readOnly=true destructive=false params=[slug]
+  • list_categories — List categories
+      readOnly=true destructive=false params=[]
+
+── list_categories({})  — the browse dimension
+   ok in 865ms
+   │ {
+   │   "total": 23,
+   │   "categories": [
+   │     {
+   │       "slug": "accounting",
+   │       "name": "Accounting",
+   │       "agentCount": 11,
+   │       "description": ""
+   │     },
+   │     {
+   │       "slug": "assistant",
+   │       "name": "Assistant",
+   │       "agentCount": 42,
+   │       "description": ""
+   │ … (143 lines total)
+
+── list_agents({"category":"customer-service","limit":3})  — browse one category
+   ok in 4570ms
+   │ {
+   │   "total": 27,
+   │   "returned": 3,
+   │   "offset": 0,
+   │   "agents": [
+   │     {
+   │       "slug": "ada",
+   │       "name": "Ada",
+   │       "tagline": "Agentic customer service that resolves cases across voice, chat and email",
+   │       "categories": [
+   │         "customer-service",
+   │         "business"
+   │       ],
+   │       "pricing": "Paid",
+   │ … (50 lines total)
+
+── search_agents({"query":"voice agent for support","limit":3})  — free-text search
+   ok in 7ms
+   │ {
+   │   "query": "voice agent for support",
+   │   "matches": 3,
+   │   "agents": [
+   │     {
+   │       "slug": "elevenlabs-agents",
+   │       "name": "ElevenAgents",
+   │       "tagline": "Voice and chat agents in 70+ languages on ElevenLabs speech models",
+   │       "categories": [
+   │         "customer-service",
+   │         "development",
+   │         "audio-and-music"
+   │       ],
+   │       "pricing": "Freemium",
+   │ … (50 lines total)
+
+── get_agent({"slug":"decagon"})  — full profile
+   ok in 2ms
+   │ {
+   │   "description": "Runs enterprise customer conversations across chat, voice, and email from a single intelligence layer. The differentiator is Agent Operating Procedures: workflows written as natural-language instructions rather than flowchart config, so CX teams change agent behavior without an engineering sprint, then validate it with simulations, live A/B experiments, and always-on QA.",
+   │   "longDescription": "Decagon is a conversational AI platform for large support organizations that want AI agents to resolve customer issues end to end rather than deflect them into a help center. The problem it targets is operational rather than linguistic: most enterprise bot platforms lock behavior into rigid configuration languages, so every policy change, new refund rule, or seasonal workflow turns into an engineering ticket and a multi-week release cycle.\n\nThe platform is built around Agent Operating Procedures (AOPs), which describe what an agent should do in plain language instead of decision trees. One agent definition deploys across chat, voice, and email with shared cross-channel memory. Integrations connect it to CRMs, help desks, knowledge bases, and call centers through pre-built connectors, REST APIs, MCP, and SIP trunking for telephony, so the agent can look up data, take actions, and escalate cleanly. Teams run simulations and QA at scale before launch, ship changes through live A/B Experiments, and rely on Watchtower, an always-on QA layer that reviews every conversation against custom criteria. A supervisor model checks responses for hallucinations before they are sent.\n\nCustomer logos on the site include Duolingo, Notion, Chime, Bilt, ClassPass, Curology, Gopuff, Noom, and Oura, and Decagon publishes results such as 70% combined chat and voice resolution and a 65% reduction in support costs. Security controls include SSO with Okta and Microsoft Entra, role-based access control, AES-256 encryption at rest, automatic PII redaction via Google DLP, and zero-day data retention with model providers including OpenAI and Anthropic. Pricing is not published and the company sells through sales-led demos.",
+   │   "tagline": "AI concierge agents for enterprise chat, voice, and email support",
+   │   "features": [
+   │     {
+   │       "title": "Agent Operating Procedures",
+   │       "description": "Workflows defined in natural language instead of a configuration language, so CX teams can change agent behavior and ship new procedures without engineering time."
+   │     },
+   │     {
+   │       "title": "Omnichannel intelligence layer",
+   │       "description": "One agent definition powers chat, voice, and email with shared cross-channel memory, so customers do not repeat themselves when a conversation moves channel."
+   │     },
+   │     {
+   │ … (139 lines total)
+
+── get_agent({"slug":"no-such-agent-xyz"})  — NOT FOUND — structured error, not a crash
+   ERROR in 2ms
+   │ {
+   │   "error": {
+   │     "code": "not_found",
+   │     "message": "No agent with slug \"no-such-agent-xyz\"."
+   │   }
+   │ }
+
+── get_agent({"slug":"../../etc/passwd"})  — INVALID INPUT — slug validation rejects traversal
+   ERROR in 2ms
+   │ MCP error -32602: Input validation error: Invalid arguments for tool get_agent: Must be a lowercase hyphenated slug. at slug
+
+── search_agents({"query":""})  — INVALID INPUT — empty query rejected
+   ERROR in 1ms
+   │ MCP error -32602: Input validation error: Invalid arguments for tool search_agents: Provide something to search for. at query
+
+── GUARD: no origin secret -> must be 403
+   HTTP 403  {"error":{"code":"forbidden","message":"Origin check failed."}}
+
+── GUARD: right secret, wrong host -> must be 403
+   HTTP 403  {"error":{"code":"forbidden","message":"Host not served here."}}
+
+── GUARD: right secret, wrong path (/mcp) -> must be 404
+   HTTP 404  {"error":{"code":"not_found","message":"Not found."}}
+
+── GUARD: /healthz open without secret -> 200 {"ok":true}
+
+==============================================================================
+  S-41 · Reindent Skills  [HTTP at /mcp, stateless, origin-protected — localhost]
+==============================================================================
+
+TOOLS ADVERTISED (4):
+  • list_skills — List skills
+      readOnly=true destructive=false params=[]
+  • search_skills — Search skills
+      readOnly=true destructive=false params=[query]
+  • get_skill — Get one skill
+      readOnly=true destructive=false params=[slug]
+  • install_instructions — Install instructions
+      readOnly=true destructive=false params=[slug]
+
+── list_skills({})  — the whole catalog
+   ok in 350ms
+   │ {
+   │   "library": "reindent",
+   │   "description": "The skills the Reindent studio runs on every day: boards, chat, browser. Extracted from daily production use by an agent workforce.",
+   │   "site": "https://skills.reindent.com",
+   │   "repository": "https://github.com/reindent/skills",
+   │   "total": 3,
+   │   "skills": [
+   │     {
+   │       "slug": "boards",
+   │       "description": "Repo-native project boards that update themselves as you prompt to code: plain markdown files are the single source of truth, rendered by a ~70-line dependency-free parser in your own app, and every change lands in the same commit as the code. No external tool, CLI, SaaS, or database.",
+   │       "category": "productivity",
+   │       "tags": [
+   │         "boards",
+   │         "kanban",
+   │ … (42 lines total)
+
+── search_skills({"query":"agents talking to each other"})  — problem statement -> skill
+   ok in 547ms
+   │ {
+   │   "query": "agents talking to each other",
+   │   "matches": 3,
+   │   "skills": [
+   │     {
+   │       "slug": "chat",
+   │       "description": "Two agents, one shared file, until they agree. A file-based agent-to-agent conversation protocol: agents take turns modifying one shared markdown canvas toward consensus, with a live web view the user gets the moment the session opens. Works across different agent CLIs.",
+   │       "category": "development",
+   │       "tags": [
+   │         "multi-agent",
+   │         "consensus",
+   │         "a2a"
+   │       ],
+   │       "page": "https://skills.reindent.com/chat",
+   │ … (42 lines total)
+
+── search_skills({"query":"project board in my repo"})  — searches full skill documents
+   ok in 5ms
+   │ {
+   │   "query": "project board in my repo",
+   │   "matches": 3,
+   │   "skills": [
+   │     {
+   │       "slug": "boards",
+   │       "description": "Repo-native project boards that update themselves as you prompt to code: plain markdown files are the single source of truth, rendered by a ~70-line dependency-free parser in your own app, and every change lands in the same commit as the code. No external tool, CLI, SaaS, or database.",
+   │       "category": "productivity",
+   │       "tags": [
+   │         "boards",
+   │         "kanban",
+   │         "markdown"
+   │       ],
+   │       "page": "https://skills.reindent.com/boards",
+   │ … (42 lines total)
+
+── get_skill({"slug":"boards"})  — full SKILL.md + metadata
+   ok in 176ms
+   │ {
+   │   "slug": "boards",
+   │   "displayName": "Boards",
+   │   "version": "1.0.0",
+   │   "description": "Repo-native project boards that update themselves as you prompt to code: plain markdown files are the single source of truth, rendered by a ~70-line dependency-free parser in your own app, and every change lands in the same commit as the code. No external tool, CLI, SaaS, or database.",
+   │   "category": "productivity",
+   │   "tags": [
+   │     "boards",
+   │     "kanban",
+   │     "markdown"
+   │   ],
+   │   "keywords": [
+   │     "boards",
+   │     "kanban",
+   │ … (29 lines total)
+
+── install_instructions({"slug":"browser"})  — exact steps incl. post-install
+   ok in 6ms
+   │ {
+   │   "slug": "browser",
+   │   "claudeCode": {
+   │     "steps": [
+   │       "Add the marketplace once:",
+   │       "/plugin marketplace add reindent/skills",
+   │       "Then install this skill:",
+   │       "/plugin install browser@reindent"
+   │     ],
+   │     "snippet": "/plugin marketplace add reindent/skills\n/plugin install browser@reindent",
+   │     "loadsAs": "browser:browser"
+   │   },
+   │   "plainSkills": {
+   │     "note": "If you prefer plain skills rather than Claude Code plugins:",
+   │ … (19 lines total)
+
+── get_skill({"slug":"nonexistent"})  — NOT FOUND — lists what IS available
+   ERROR in 4ms
+   │ {
+   │   "error": {
+   │     "code": "not_found",
+   │     "message": "No skill named \"nonexistent\"."
+   │   }
+   │ }
+
+── get_skill({"slug":"Boards"})  — INVALID INPUT — uppercase rejected by slug rule
+   ERROR in 3ms
+   │ MCP error -32602: Input validation error: Invalid arguments for tool get_skill: Must be a lowercase hyphenated slug. at slug
+
+── GUARD: no origin secret -> must be 403
+   HTTP 403  {"error":{"code":"forbidden","message":"Origin check failed."}}
+
+── GUARD: right secret, wrong host -> must be 403
+   HTTP 403  {"error":{"code":"forbidden","message":"Host not served here."}}
+
+── GUARD: right secret, wrong path (/nope) -> must be 404
+   HTTP 404  {"error":{"code":"not_found","message":"Not found."}}
+
+── GUARD: /healthz open without secret -> 200 {"ok":true}

@@ -1,0 +1,23 @@
+{
+  "name": "@reindent/mcp-servers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reindent's public read-only MCP servers: the skills library and the AgenticList catalog",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start:agenticlist": "node dist/agenticlist/index.js",
+    "start:skills": "node dist/skills/index.js",
+    "demo": "node dist/demo/exercise.js",
+    "test": "node --test dist/test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "typescript": "^5.9.3"
+  }
+}
